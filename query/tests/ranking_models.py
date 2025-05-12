@@ -1,5 +1,5 @@
 from query.ranking_models import IndexPreComputedVals,VectorRankingModel,BooleanRankingModel,  OPERATOR
-from index.structure import HashIndex,FileIndex,TermOccurrence
+from index.structure import HashIndex,TermOccurrence
 import unittest
 
 class RankingModelTest(unittest.TestCase):
@@ -41,7 +41,7 @@ class RankingModelTest(unittest.TestCase):
                                     "times":TermOccurrence(None, 6, 1)}]
                                     ]
     def test_precomputed_vals(self):
-        index = FileIndex()
+        index = HashIndex()
         index.index("new",1,4)
         index.index("york",1,1)
         index.index("times",1,1)
@@ -75,22 +75,22 @@ class RankingModelTest(unittest.TestCase):
         for idx, map_index in enumerate(self.arr_indexes):
             for query_position, map_query in enumerate(self.arr_queries_per_idx[idx]):
                 model_and = BooleanRankingModel(OPERATOR.AND)
-                map_index_for_query = self.obtem_index_for_query(map_query,map_index)
+                map_index_for_query = self.obtem_index_for_query(map_query, map_index)
                 lst_response,_ = model_and.get_ordered_docs(map_query, map_index_for_query)
                 set_response =  set(lst_response)
                 self.assertSetEqual(set_response, arr_set_esperado_and_per_query[idx][query_position],
-                                    msg=f"Consulta com operador AND obteve um resultado inesperado ({set_response}) para o indice {idx} consulta {query_position}. Esperava-se: {arr_set_esperado_and_per_query[idx][query_position]} ")
+                                    msg=f"Consulta com operador AND obteve um resultado inesperado ({set_response}) para o indice {idx}\n consulta: {map_query},\n lista de ocorrencias: {map_index_for_query}.\n Esperava-se: {arr_set_esperado_and_per_query[idx][query_position]} \n obteve:  {set_response}")
 
                 model_or = BooleanRankingModel(OPERATOR.OR)
                 lst_response,_ = model_or.get_ordered_docs(map_query, map_index_for_query)
                 set_response =  set(lst_response)
                 self.assertSetEqual(set_response, arr_set_esperado_or_per_query[idx][query_position],
-                                    msg=f"Consulta com operador OR obteve um resultado inesperado ({set_response}) para o indice {idx} consulta {query_position}. Esperava-se: {arr_set_esperado_or_per_query[idx][query_position]} ")
+                                    msg=f"Consulta com operador AND obteve um resultado inesperado ({set_response}) para o indice {idx}\n consulta: {map_query},\n lista de ocorrencias: {map_index_for_query}.\n Esperava-se: {arr_set_esperado_or_per_query[idx][query_position]}\n obteve:  {set_response}")
                 
 
 
     def test_vector_model(self):
-        index = FileIndex()
+        index = HashIndex()
         precomp = IndexPreComputedVals(index)
         
         arr_lst_esperado_per_query  = [[[2,4,1],[]],[[1,2,3]]]
